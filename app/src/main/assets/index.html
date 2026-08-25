@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="ha">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manajan Kudi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0d1117;
+    --bg-2:#0a0d12;
+    --card:#171d28;
+    --card-alt:#1f2733;
+    --line:#252d3a;
+    --primary:#4285f5;
+    --primary-dim:#2f5fb0;
+    --green:#22c78c;
+    --red:#f2525c;
+    --yellow:#f2b840;
+    --grey:#8c94a1;
+    --text:#eef1f5;
+    --subtext:#8b93a1;
+    --radius:18px;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    min-height:100vh;
+    display:flex;
+    align-items:flex-start;
+    justify-content:center;
+    background:
+      radial-gradient(circle at 20% 0%, rgba(66,133,245,0.10), transparent 45%),
+      radial-gradient(circle at 85% 15%, rgba(34,199,140,0.08), transparent 40%),
+      var(--bg-2);
+    font-family:'Inter',sans-serif;
+    color:var(--text);
+    padding:32px 16px;
+  }
+  .device{
+    width:100%;
+    max-width:400px;
+    min-height:780px;
+    background:var(--bg);
+    border-radius:36px;
+    border:1px solid #232b38;
+    box-shadow:0 30px 80px -20px rgba(0,0,0,0.6), 0 0 0 8px #05070a;
+    overflow:hidden;
+    position:relative;
+    display:flex;
+    flex-direction:column;
+  }
+  .notch{
+    position:absolute;
+    top:0; left:50%; transform:translateX(-50%);
+    width:120px; height:22px;
+    background:#05070a;
+    border-radius:0 0 16px 16px;
+    z-index:20;
+  }
+  .screen{
+    display:none;
+    flex-direction:column;
+    padding:44px 20px 24px;
+    flex:1;
+    animation:fadein .28s ease;
+  }
+  .screen.active{display:flex;}
+  @keyframes fadein{
+    from{opacity:0; transform:translateY(8px);}
+    to{opacity:1; transform:translateY(0);}
+  }
+  h1.eyebrow{
+    font-family:'Space Grotesk',sans-serif;
+    font-size:13px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--subtext);
+    margin:0 0 4px;
+    font-weight:500;
+  }
+  h1.title{
+    font-family:'Space Grotesk',sans-serif;
+    font-size:26px;
+    font-weight:700;
+    margin:0 0 22px;
+    color:var(--text);
+  }
+  .card{
+    background:linear-gradient(155deg, var(--card), #141a24);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:22px;
+    position:relative;
+    overflow:hidden;
+  }
+  .card .naira-mark{
+    position:absolute;
+    right:-10px; top:-18px;
+    font-family:'Space Grotesk',sans-serif;
+    font-size:110px;
+    font-weight:700;
+    color:rgba(255,255,255,0.025);
+    line-height:1;
+    pointer-events:none;
+  }
+  .balance-card{margin-bottom:20px;}
+  .balance-card .label{
+    color:var(--subtext);
+    font-size:13px;
+    font-weight:500;
+    margin-bottom:8px;
+  }
+  .balance-card .amount{
+    font-family:'Space Grotesk',sans-serif;
+    font-size:34px;
+    font-weight:700;
+    color:var(--green);
+    letter-spacing:-0.02em;
+  }
+  .balance-card .amount.negative{color:var(--red);}
+  .sparkline{
+    margin-top:14px;
+    height:34px;
+    width:100%;
+  }
+  .menu-list{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    margin-top:4px;
+  }
+  .menu-btn{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    width:100%;
+    border:none;
+    border-radius:14px;
+    padding:15px 16px;
+    font-family:'Inter',sans-serif;
+    font-size:15.5px;
+    font-weight:600;
+    color:var(--text);
+    cursor:pointer;
+    text-align:left;
+    transition:transform .12s ease, filter .12s ease;
+  }
+  .menu-btn:active{transform:scale(0.98); filter:brightness(0.85);}
+  .menu-btn .swatch{
+    width:9px; height:9px; border-radius:50%;
+    background:currentColor;
+    flex-shrink:0;
+  }
+  .menu-btn.c-green{background:rgba(34,199,140,0.12); color:var(--green);}
+  .menu-btn.c-primary{background:rgba(66,133,245,0.12); color:var(--primary);}
+  .menu-btn.c-red{background:rgba(242,82,92,0.12); color:var(--red);}
+  .menu-btn.c-yellow{background:rgba(242,184,64,0.12); color:var(--yellow);}
+  .menu-btn.c-grey{background:rgba(140,148,161,0.12); color:var(--grey);}
+  .menu-btn .label-text{color:var(--text);}
+
+  .field{
+    margin-bottom:14px;
+  }
+  .field label{
+    display:block;
+    font-size:12.5px;
+    color:var(--subtext);
+    margin-bottom:6px;
+    font-weight:500;
+  }
+  .field input{
+    width:100%;
+    background:var(--card-alt);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:13px 14px;
+    color:var(--text);
+    font-size:15px;
+    font-family:'Inter',sans-serif;
+    outline:none;
+    transition:border-color .15s ease;
+  }
+  .field input:focus{border-color:var(--primary);}
+  .field input::placeholder{color:#5a6270;}
+
+  .spacer{flex:1;}
+
+  .btn{
+    border:none;
+    border-radius:14px;
+    padding:16px;
+    font-family:'Inter',sans-serif;
+    font-size:15.5px;
+    font-weight:700;
+    color:#0a0d12;
+    cursor:pointer;
+    width:100%;
+    transition:transform .12s ease, filter .12s ease;
+  }
+  .btn:active{transform:scale(0.98); filter:brightness(0.9);}
+  .btn-primary{background:var(--green); color:#06251a;}
+  .btn-danger{background:var(--red); color:#2b0507;}
+  .btn-yellow{background:var(--yellow); color:#2b1e02;}
+  .btn-back{
+    background:transparent;
+    border:1px solid var(--line);
+    color:var(--grey);
+    margin-top:10px;
+    font-weight:600;
+  }
+  .btn-row{display:flex; flex-direction:column; gap:10px; margin-top:8px;}
+
+  .history-scroll{
+    flex:1;
+    overflow-y:auto;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    margin-bottom:12px;
+    padding-right:2px;
+  }
+  .history-scroll::-webkit-scrollbar{width:4px;}
+  .history-scroll::-webkit-scrollbar-thumb{background:var(--line); border-radius:4px;}
+  .history-row{
+    background:var(--card-alt);
+    border-radius:14px;
+    padding:13px 14px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+  }
+  .history-row .note{font-size:14.5px; font-weight:600; color:var(--text);}
+  .history-row .date{font-size:11.5px; color:var(--subtext); margin-top:2px;}
+  .history-row .amt{
+    font-family:'Space Grotesk',sans-serif;
+    font-weight:700;
+    font-size:15px;
+    white-space:nowrap;
+  }
+  .amt.pos{color:var(--green);}
+  .amt.neg{color:var(--red);}
+  .empty-state{
+    color:var(--subtext);
+    text-align:center;
+    margin-top:40px;
+    font-size:14px;
+  }
+
+  .goal-ring-wrap{
+    display:flex;
+    justify-content:center;
+    margin:6px 0 18px;
+  }
+  .goal-ring-pct{
+    font-family:'Space Grotesk',sans-serif;
+    font-size:26px;
+    font-weight:700;
+    fill:var(--text);
+  }
+  .goal-numbers{
+    text-align:center;
+    margin-bottom:18px;
+  }
+  .goal-numbers .g-target{font-size:13px; color:var(--subtext);}
+  .goal-numbers .g-target b{color:var(--yellow); font-weight:700;}
+  .goal-numbers .g-have{font-size:13px; color:var(--subtext); margin-top:2px;}
+  .goal-numbers .g-have b{color:var(--text); font-weight:700;}
+
+  .warn-card{
+    background:rgba(242,82,92,0.08);
+    border:1px solid rgba(242,82,92,0.25);
+    border-radius:14px;
+    padding:16px;
+    color:var(--text);
+    font-size:14.5px;
+    line-height:1.5;
+    text-align:center;
+  }
+
+  .toast{
+    position:absolute;
+    left:16px; right:16px;
+    top:14px;
+    z-index:50;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-left:4px solid var(--primary);
+    border-radius:12px;
+    padding:12px 14px;
+    box-shadow:0 12px 30px -8px rgba(0,0,0,0.5);
+    transform:translateY(-140%);
+    transition:transform .3s cubic-bezier(.2,.9,.3,1.2);
+    pointer-events:none;
+  }
+  .toast.show{transform:translateY(0);}
+  .toast .t-title{font-size:13.5px; font-weight:700; margin-bottom:2px;}
+  .toast .t-msg{font-size:12.5px; color:var(--subtext);}
+
+  ::selection{background:rgba(66,133,245,0.35);}
+</style>
+</head>
+<body>
+
+<div class="device">
+  <div class="notch"></div>
+  <div id="toast" class="toast">
+    <div class="t-title" id="toastTitle"></div>
+    <div class="t-msg" id="toastMsg"></div>
+  </div>
+
+  <!-- MENU -->
+  <section class="screen active" id="screen-menu">
+    <h1 class="eyebrow">Barka da zuwa</h1>
+    <h1 class="title">Manajan Kudi</h1>
+
+    <div class="card balance-card">
+      <div class="naira-mark">₦</div>
+      <div class="label">Ma'auni Na Yanzu</div>
+      <div class="amount" id="menuBalance">0 Naira</div>
+      <svg class="sparkline" id="sparkline" viewBox="0 0 300 34" preserveAspectRatio="none"></svg>
+    </div>
+
+    <div class="menu-list">
+      <button class="menu-btn c-green" onclick="go('add')"><span class="swatch"></span><span class="label-text">Sanya Kudi</span></button>
+      <button class="menu-btn c-primary" onclick="go('balance')"><span class="swatch"></span><span class="label-text">Duba Ma'auni</span></button>
+      <button class="menu-btn c-primary" onclick="go('history')"><span class="swatch"></span><span class="label-text">Tarihin Kudi</span></button>
+      <button class="menu-btn c-red" onclick="go('spend')"><span class="swatch"></span><span class="label-text">Cire Kudi</span></button>
+      <button class="menu-btn c-yellow" onclick="go('goal')"><span class="swatch"></span><span class="label-text">Manufar Ajiya</span></button>
+      <button class="menu-btn c-grey" onclick="go('reset')"><span class="swatch"></span><span class="label-text">Share Duk Bayanai</span></button>
+    </div>
+  </section>
+
+  <!-- ADD MONEY -->
+  <section class="screen" id="screen-add">
+    <h1 class="title">Sanya Kudi</h1>
+    <div class="field">
+      <label>Adadin kudi</label>
+      <input id="addAmount" type="number" inputmode="decimal" placeholder="misali 5000">
+    </div>
+    <div class="field">
+      <label>Bayani</label>
+      <input id="addNote" type="text" placeholder="misali: Albashi">
+    </div>
+    <div class="spacer"></div>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="saveMoney()">Ajiye</button>
+      <button class="btn btn-back" onclick="go('menu')">&lt; Koma Baya</button>
+    </div>
+  </section>
+
+  <!-- SPEND -->
+  <section class="screen" id="screen-spend">
+    <h1 class="title">Cire Kudi</h1>
+    <div class="field">
+      <label>Adadin da za a cire</label>
+      <input id="spendAmount" type="number" inputmode="decimal" placeholder="misali 2000">
+    </div>
+    <div class="field">
+      <label>Bayani</label>
+      <input id="spendNote" type="text" placeholder="misali: Kayan abinci">
+    </div>
+    <div class="spacer"></div>
+    <div class="btn-row">
+      <button class="btn btn-danger" onclick="spendMoney()">Cire</button>
+      <button class="btn btn-back" onclick="go('menu')">&lt; Koma Baya</button>
+    </div>
+  </section>
+
+  <!-- BALANCE -->
+  <section class="screen" id="screen-balance">
+    <h1 class="title">Ma'aunin Asusu</h1>
+    <div class="card" style="text-align:center; padding:32px 20px;">
+      <div class="naira-mark" style="right:8px; top:-10px;">₦</div>
+      <div class="label" style="margin-bottom:10px;">Jimlar Kudinka</div>
+      <div class="amount" id="fullBalance" style="font-size:38px;">0</div>
+    </div>
+    <div class="spacer"></div>
+    <button class="btn btn-back" onclick="go('menu')">&lt; Koma Baya</button>
+  </section>
+
+  <!-- HISTORY -->
+  <section class="screen" id="screen-history">
+    <h1 class="title">Tarihin Kudi</h1>
+    <div class="history-scroll" id="historyList"></div>
+    <button class="btn btn-back" onclick="go('menu')">&lt; Koma Baya</button>
+  </section>
+
+  <!-- GOAL -->
+  <section class="screen" id="screen-goal">
+    <h1 class="title">Manufar Ajiya</h1>
+    <div class="goal-ring-wrap">
+      <svg width="150" height="150" viewBox="0 0 150 150">
+        <circle cx="75" cy="75" r="62" fill="none" stroke="#1f2733" stroke-width="12"/>
+        <circle id="goalRing" cx="75" cy="75" r="62" fill="none" stroke="#f2b840" stroke-width="12"
+          stroke-linecap="round" stroke-dasharray="389.6" stroke-dashoffset="389.6"
+          transform="rotate(-90 75 75)" style="transition:stroke-dashoffset .5s ease;"/>
+        <text x="75" y="82" text-anchor="middle" class="goal-ring-pct" id="goalPct">0%</text>
+      </svg>
+    </div>
+    <div class="goal-numbers" id="goalNumbers">
+      <div class="g-target">Ba a saita manufa ba tukuna.</div>
+    </div>
+    <div class="field">
+      <label>Sabuwar manufa</label>
+      <input id="goalInput" type="number" inputmode="decimal" placeholder="misali 100000">
+    </div>
+    <button class="btn btn-yellow" onclick="saveGoal()">Ajiye Manufa</button>
+    <div class="spacer"></div>
+    <button class="btn btn-back" onclick="go('menu')">&lt; Koma Baya</button>
+  </section>
+
+  <!-- RESET -->
+  <section class="screen" id="screen-reset">
+    <h1 class="title">Share Duk Bayanai</h1>
+    <div class="warn-card">Wannan zai share duk bayanan kudi da tarihi. Kana da tabbaci?</div>
+    <div class="spacer"></div>
+    <div class="btn-row">
+      <button class="btn btn-danger" onclick="confirmReset()">Ee, Share Duk Bayanai</button>
+      <button class="btn btn-back" onclick="go('menu')">&lt; Koma Baya</button>
+    </div>
+  </section>
+
+</div>
+
+<script>
+const STORE_KEY = 'kudi-data';
+let data = { balance: 0, history: [], goal: 0 };
+
+function loadData(){
+  try{
+    const raw = localStorage.getItem(STORE_KEY);
+    if(raw){ data = JSON.parse(raw); }
+  }catch(e){ /* no data saved yet, or storage unavailable */ }
+  renderMenu();
+}
+
+function persist(){
+  try{ localStorage.setItem(STORE_KEY, JSON.stringify(data)); }
+  catch(e){ console.error('Storage error', e); }
+}
+
+function fmt(n){
+  return Math.round(n).toLocaleString('en-US') + ' Naira';
+}
+
+function go(name){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+name).classList.add('active');
+  if(name==='menu') renderMenu();
+  if(name==='balance') renderBalance();
+  if(name==='history') renderHistory();
+  if(name==='goal') renderGoal();
+}
+
+let toastTimer;
+function showToast(title, msg, color){
+  const t = document.getElementById('toast');
+  document.getElementById('toastTitle').textContent = title;
+  document.getElementById('toastTitle').style.color = color;
+  document.getElementById('toastMsg').textContent = msg;
+  t.style.borderLeftColor = color;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.remove('show'), 2400);
+}
+
+const COL_GREEN = '#22c78c', COL_RED = '#f2525c', COL_PRIMARY = '#4285f5';
+
+function renderMenu(){
+  const bEl = document.getElementById('menuBalance');
+  bEl.textContent = fmt(data.balance);
+  bEl.classList.toggle('negative', data.balance < 0);
+  drawSparkline();
+}
+
+function drawSparkline(){
+  const svg = document.getElementById('sparkline');
+  const hist = data.history.slice(-12);
+  if(hist.length < 2){ svg.innerHTML=''; return; }
+  let running = data.balance;
+  const points = [running];
+  for(let i = hist.length - 1; i >= 0; i--){
+    const h = hist[i];
+    running = h.type === 'Sanya' ? running - h.amount : running + h.amount;
+    points.unshift(running);
+  }
+  const min = Math.min(...points), max = Math.max(...points);
+  const range = (max - min) || 1;
+  const w = 300, h = 34, pad = 3;
+  const step = w / (points.length - 1);
+  const coords = points.map((p,i)=>{
+    const x = i*step;
+    const y = h - pad - ((p-min)/range)*(h-pad*2);
+    return [x,y];
+  });
+  const path = coords.map((c,i)=> (i===0?'M':'L')+c[0].toFixed(1)+','+c[1].toFixed(1)).join(' ');
+  const up = points[points.length-1] >= points[0];
+  svg.innerHTML = `<path d="${path}" fill="none" stroke="${up?COL_GREEN:COL_RED}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`;
+}
+
+function renderBalance(){
+  document.getElementById('fullBalance').textContent = fmt(data.balance);
+  document.getElementById('fullBalance').classList.toggle('negative', data.balance < 0);
+}
+
+function renderHistory(){
+  const list = document.getElementById('historyList');
+  const hist = [...data.history].reverse();
+  if(hist.length === 0){
+    list.innerHTML = '<div class="empty-state">Babu tarihi tukuna.</div>';
+    return;
+  }
+  list.innerHTML = hist.map(item=>{
+    const isAdd = item.type === 'Sanya';
+    const sign = isAdd ? '+' : '-';
+    const cls = isAdd ? 'pos' : 'neg';
+    const note = (item.note && item.note.trim()) ? item.note : item.type;
+    return `<div class="history-row">
+      <div>
+        <div class="note">${escapeHtml(note)}</div>
+        <div class="date">${item.date}</div>
+      </div>
+      <div class="amt ${cls}">${sign}${Math.round(item.amount).toLocaleString('en-US')}</div>
+    </div>`;
+  }).join('');
+}
+
+function escapeHtml(s){
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+function renderGoal(){
+  const ring = document.getElementById('goalRing');
+  const pctEl = document.getElementById('goalPct');
+  const numbers = document.getElementById('goalNumbers');
+  const CIRC = 389.6;
+  if(data.goal > 0){
+    const pct = Math.max(0, Math.min(100, (data.balance / data.goal) * 100));
+    ring.style.strokeDashoffset = CIRC - (CIRC * pct/100);
+    pctEl.textContent = Math.round(pct) + '%';
+    numbers.innerHTML = `
+      <div class="g-target">Manufa: <b>${fmt(data.goal)}</b></div>
+      <div class="g-have">Ka riga ka samu: <b>${fmt(data.balance)}</b></div>`;
+  } else {
+    ring.style.strokeDashoffset = CIRC;
+    pctEl.textContent = '0%';
+    numbers.innerHTML = `<div class="g-target">Ba a saita manufa ba tukuna.</div>`;
+  }
+}
+
+function dateNow(){
+  const d = new Date();
+  const pad = n=>String(n).padStart(2,'0');
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+function saveMoney(){
+  const amountInput = document.getElementById('addAmount');
+  const noteInput = document.getElementById('addNote');
+  const text = amountInput.value.trim();
+  if(!text){ showToast('Kuskure','Da fatan za a shigar da adadin kudi.', COL_RED); return; }
+  const amount = parseFloat(text);
+  if(isNaN(amount)){ showToast('Kuskure','Shigar da lambobi kawai.', COL_RED); return; }
+  if(amount <= 0){ showToast('Kuskure','Adadin dole ya fi sifili.', COL_RED); return; }
+
+  data.balance += amount;
+  data.history.push({ type:'Sanya', amount, note: noteInput.value.trim(), date: dateNow() });
+  persist();
+
+  amountInput.value = '';
+  noteInput.value = '';
+  showToast('An yi nasara', `An sanya ${Math.round(amount).toLocaleString('en-US')} Naira.`, COL_GREEN);
+  go('menu');
+}
+
+function spendMoney(){
+  const amountInput = document.getElementById('spendAmount');
+  const noteInput = document.getElementById('spendNote');
+  const text = amountInput.value.trim();
+  if(!text){ showToast('Kuskure','Da fatan za a shigar da adadin kudi.', COL_RED); return; }
+  const amount = parseFloat(text);
+  if(isNaN(amount)){ showToast('Kuskure','Shigar da lambobi kawai.', COL_RED); return; }
+  if(amount <= 0){ showToast('Kuskure','Adadin dole ya fi sifili.', COL_RED); return; }
+  if(amount > data.balance){ showToast('Kuskure',"Ma'aunin ka bai kai wannan adadin ba.", COL_RED); return; }
+
+  data.balance -= amount;
+  data.history.push({ type:'Cire', amount, note: noteInput.value.trim(), date: dateNow() });
+  persist();
+
+  amountInput.value = '';
+  noteInput.value = '';
+  showToast('An yi nasara', `An cire ${Math.round(amount).toLocaleString('en-US')} Naira.`, COL_GREEN);
+  go('menu');
+}
+
+function saveGoal(){
+  const input = document.getElementById('goalInput');
+  const text = input.value.trim();
+  if(!text){ showToast('Kuskure','Shigar da adadin manufa.', COL_RED); return; }
+  const goal = parseFloat(text);
+  if(isNaN(goal)){ showToast('Kuskure','Shigar da lambobi kawai.', COL_RED); return; }
+
+  data.goal = goal;
+  persist();
+  input.value = '';
+  showToast('An yi nasara', 'An ajiye manufar ajiya.', COL_GREEN);
+  renderGoal();
+}
+
+function confirmReset(){
+  data = { balance: 0, history: [], goal: 0 };
+  persist();
+  showToast('An yi nasara', 'An share duk bayanai.', COL_GREEN);
+  go('menu');
+}
+
+loadData();
+</script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+<resources>
+    <style name="Theme.ManajanKudi" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">#4285f5</item>
+        <item name="colorPrimaryDark">#2f5fb0</item>
+        <item name="colorAccent">#22c78c</item>
+        <item name="android:windowBackground">@color/app_background</item>
+        <item name="android:statusBarColor">@color/app_background</item>
+    </style>
+</resources>
